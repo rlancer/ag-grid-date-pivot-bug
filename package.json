@@ -9,6 +9,9 @@
   ],
   "main": "src/index.tsx",
   "dependencies": {
+    "ag-grid-community": "^34.2.0",
+    "ag-grid-enterprise": "^34.2.0",
+    "ag-grid-react": "^34.2.0",
     "loader-utils": "3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
