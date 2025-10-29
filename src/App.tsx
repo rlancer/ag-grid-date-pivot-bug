@@ -1,6 +1,6 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, GridOptions, CellStyle, ModuleRegistry } from 'ag-grid-community';
+import { ColDef, GridOptions, CellStyle, ModuleRegistry, GridApi } from 'ag-grid-community';
 import { AllCommunityModule } from 'ag-grid-community';
 import { RowGroupingModule, ColumnsToolPanelModule, PivotModule } from 'ag-grid-enterprise';
 import { ClientSideRowModelModule } from 'ag-grid-community';
@@ -20,6 +20,7 @@ ModuleRegistry.registerModules([
 
 export default function App() {
   const { startDate: defaultStart, endDate: defaultEnd } = getDefaultDateRange();
+  const gridRef = useRef<AgGridReact>(null);
 
   const [startDate, setStartDate] = useState<string>(
     defaultStart.toISOString().split('T')[0]
@@ -35,12 +36,19 @@ export default function App() {
     return generatePositionData(start, end);
   }, [startDate, endDate]);
 
+  // Refresh pivot columns when data changes
+  useEffect(() => {
+    if (gridRef.current?.api) {
+      gridRef.current.api.refreshClientSideRowModel('aggregate');
+    }
+  }, [rowData]);
+
   // Column definitions with pivot configuration
   const columnDefs = useMemo<ColDef[]>(() => [
     {
       field: 'ticker',
       headerName: 'Ticker',
-      rowGroup: false,
+      rowGroup: true,
       enableRowGroup: true,
       width: 120,
     },
@@ -129,6 +137,7 @@ export default function App() {
       </div>
       <div className="ag-theme-alpine" style={{ height: 'calc(100vh - 200px)', width: '100%' }}>
         <AgGridReact
+          ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
