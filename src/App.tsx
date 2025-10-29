@@ -17,7 +17,24 @@ ModuleRegistry.registerModules([
   PivotModule,
   ColumnsToolPanelModule
 ]);
+export function dateComparator(
+  date1: string | Date,
+  date2: string | Date
+): number {
+  const date1Number = new Date(date1).getTime();
+  const date2Number = new Date(date2).getTime();
+  if (isNaN(date1Number) && isNaN(date2Number)) {
+    return 0;
+  }
+  if (isNaN(date1Number)) {
+    return -1;
+  }
+  if (isNaN(date2Number)) {
+    return 1;
+  }
 
+  return date1Number - date2Number;
+}
 export default function App() {
   const { startDate: defaultStart, endDate: defaultEnd } = getDefaultDateRange();
   const gridRef = useRef<AgGridReact>(null);
@@ -58,6 +75,8 @@ export default function App() {
       pivot: true,
       enablePivot: true,
       width: 120,
+      pivotComparator: (a, b) => dateComparator(b, a),
+
     },
     {
       field: 'price',
@@ -70,22 +89,8 @@ export default function App() {
         return '';
       },
     },
-    {
-      field: 'pnl',
-      headerName: 'P&L',
-      aggFunc: 'sum',
-      valueFormatter: (params) => {
-        if (params.value != null) {
-          const formatted = '$' + params.value.toFixed(2);
-          return params.value >= 0 ? formatted : formatted;
-        }
-        return '';
-      },
-      cellClassRules: {
-        'pnl-positive': (params) => params.value != null && params.value > 0,
-        'pnl-negative': (params) => params.value != null && params.value < 0,
-      },
-    },
+
+
   ], []);
 
   const defaultColDef = useMemo<ColDef>(() => ({
