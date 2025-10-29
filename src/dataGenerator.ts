@@ -85,12 +85,18 @@ export function generatePositionData(startDate: Date, endDate: Date): PositionDa
 }
 
 /**
- * Get default date range (last 30 business days)
+ * Get default date range (1 month ago to 3 days from start date)
  */
 export function getDefaultDateRange(): { startDate: Date; endDate: Date } {
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - 60); // Go back ~60 days to get ~30 business days
+  const today = new Date();
+
+  // Start date: 1 month ago
+  const startDate = new Date(today);
+  startDate.setMonth(startDate.getMonth() - 1);
+
+  // End date: 3 days from start date
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 3);
 
   return { startDate, endDate };
 }
