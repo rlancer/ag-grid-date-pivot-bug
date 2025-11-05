@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { AllEnterpriseModule, ColDef, GridOptions, ModuleRegistry } from 'ag-grid-enterprise';
