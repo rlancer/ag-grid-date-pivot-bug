@@ -26,7 +26,7 @@ export default function App() {
   }, []);
 
   // State to simulate loading - rowData will be null for 1 second, then becomes { records: [...] }
-  const [rowData, setRowData] = useState<{ records: any[] } | null>(null);
+  const [rowData, setRowData] = useState<{ records: any[] | undefined } | null>({ records: undefined });
   const [grid1LoadTime, setGrid1LoadTime] = useState<number | null>(null);
   const [grid2LoadTime, setGrid2LoadTime] = useState<number | null>(null);
 
