@@ -1,19 +1,21 @@
 import 'devextreme/dist/css/dx.light.css';
 import { useMemo, useState, useEffect, useRef } from 'react';
-import DataGrid, { Column, Grouping, GroupPanel, SearchPanel, FilterRow, HeaderFilter, Summary, TotalItem } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Grouping, GroupPanel, SearchPanel, FilterRow, HeaderFilter, Summary, TotalItem, Paging } from 'devextreme-react/data-grid';
 import { generateBulkData } from '../src/dataGenerator';
+import { Slider } from '@/components/ui/slider';
 
 export default function DevExtremeGrid() {
   const dataLoadTimeRef = useRef<number | null>(null);
+  const [rowCount, setRowCount] = useState(5000);
 
-  // Generate 60k rows of data
+  // Generate data based on rowCount
   const data = useMemo(() => {
-    console.log('Generating 60,000 rows...');
-    const records = generateBulkData(60000);
+    console.log(`Generating ${rowCount.toLocaleString()} rows...`);
+    const records = generateBulkData(rowCount);
     console.log('Data generated:', records.length, 'rows');
     console.log('First row sample:', records[0]);
     return records;
-  }, []);
+  }, [rowCount]);
 
   // State to simulate loading
   const [rowData, setRowData] = useState<any[] | null>(null);
@@ -41,11 +43,24 @@ export default function DevExtremeGrid() {
   return (
     <div className="App">
       <div className="header">
-        <h1>DevExtreme DataGrid Performance Test - 60k Rows</h1>
+        <h1>DevExtreme DataGrid Performance Test - {rowCount.toLocaleString()} Rows</h1>
+        <div style={{ marginBottom: '20px', padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '16px', fontWeight: 'bold' }}>
+            <span style={{ minWidth: '150px' }}>Number of Rows: {rowCount.toLocaleString()}</span>
+            <Slider
+              value={[rowCount]}
+              onValueChange={(value) => setRowCount(value[0])}
+              min={5000}
+              max={60000}
+              step={5000}
+              className="flex-1"
+            />
+          </label>
+        </div>
         <p className="info">
           {rowData === null
             ? '🔄 Loading data...'
-            : `✅ Grid loaded with 60,000 rows for comparison.`}
+            : `✅ Grid loaded with ${rowCount.toLocaleString()} rows for comparison.`}
         </p>
         <div style={{
           padding: '10px',
@@ -72,9 +87,10 @@ export default function DevExtremeGrid() {
         >
           <GroupPanel visible={true} />
           <SearchPanel visible={true} />
-          <Grouping autoExpandAll={true} />
+          <Grouping autoExpandAll={false} />
           <FilterRow visible={true} />
           <HeaderFilter visible={true} />
+          <Paging enabled={false} />
 
           <Column dataField="accrual_effect" caption="Accrual Effect" />
           <Column dataField="Book.Activity" caption="Activity" />

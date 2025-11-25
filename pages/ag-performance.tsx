@@ -3,6 +3,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { AllEnterpriseModule, ColDef, GridOptions, ModuleRegistry } from 'ag-grid-enterprise';
 import { generateBulkData } from '../src/dataGenerator';
 import { columnDefs as importedColumnDefs } from '../src/columnDefs';
+import { Slider } from '@/components/ui/slider';
 
 ModuleRegistry.registerModules([
   AllEnterpriseModule,
@@ -11,15 +12,16 @@ ModuleRegistry.registerModules([
 export default function AgPerformance() {
   const gridRef = useRef<AgGridReact>(null);
   const dataLoadTimeRef = useRef<number | null>(null);
+  const [rowCount, setRowCount] = useState(5000);
 
-  // Generate 60k rows of data
+  // Generate data based on rowCount
   const data = useMemo(() => {
-    console.log('Generating 60,000 rows...');
-    const records = generateBulkData(60000);
+    console.log(`Generating ${rowCount.toLocaleString()} rows...`);
+    const records = generateBulkData(rowCount);
     console.log('Data generated:', records.length, 'rows');
     console.log('First row sample:', records[0]);
     return records;
-  }, []);
+  }, [rowCount]);
 
   // State to simulate loading - rowData will be null for 1 second, then becomes { records: [...] }
   const [rowData, setRowData] = useState<{ records: any[] | undefined } | null>({ records: undefined });
@@ -72,11 +74,24 @@ export default function AgPerformance() {
   return (
     <div className="App">
       <div className="header">
-        <h1>AG Grid Performance Test - 60k Rows</h1>
+        <h1>AG Grid Performance Test - {rowCount.toLocaleString()} Rows</h1>
+        <div style={{ marginBottom: '20px', padding: '20px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '15px', fontSize: '16px', fontWeight: 'bold' }}>
+            <span style={{ minWidth: '150px' }}>Number of Rows: {rowCount.toLocaleString()}</span>
+            <Slider
+              value={[rowCount]}
+              onValueChange={(value) => setRowCount(value[0])}
+              min={5000}
+              max={60000}
+              step={5000}
+              className="flex-1"
+            />
+          </label>
+        </div>
         <p className="info">
           {rowData === null
             ? '🔄 Loading data...'
-            : `✅ Grid loaded with 60,000 rows and ${columnDefs.length} columns.`}
+            : `✅ Grid loaded with ${rowCount.toLocaleString()} rows and ${columnDefs.length} columns.`}
         </p>
         <div style={{
           padding: '10px',
