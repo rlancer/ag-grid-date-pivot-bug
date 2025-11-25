@@ -11,6 +11,9 @@
   "dependencies": {
     "ag-grid-enterprise": "^34.3.1",
     "ag-grid-react": "^34.3.1",
+    "autoprefixer": "^10.4.22",
+    "devextreme": "24.2.12",
+    "devextreme-react": "24.2.12",
     "loader-utils": "3.2.1",
     "next": "^15.5.6",
     "react": "^19.2.0",

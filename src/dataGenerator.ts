@@ -24,6 +24,20 @@ const STRATEGIES = ['Long', 'Short', 'Spread', 'Butterfly', 'Straddle', 'Strangl
 const ENTITIES = ['Entity_A', 'Entity_B', 'Entity_C', 'Entity_D', 'Entity_E'];
 const FUNDS = ['Fund_Alpha', 'Fund_Beta', 'Fund_Gamma', 'Fund_Delta', 'Fund_Epsilon'];
 const CATEGORIES = ['Fixed Income', 'Rates', 'Credit', 'Equity', 'FX', 'Commodity'];
+const TRADERS = ['John Smith', 'Sarah Johnson', 'Michael Chen', 'Emily Rodriguez', 'David Kim', 'Jessica Brown', 'Robert Lee', 'Amanda Martinez', 'Christopher Taylor', 'Jennifer Wilson'];
+const RECAP_GROUPS = [
+  'Commodities (AP)',
+  'Equities (AP)',
+  'IFL - Inflation (AP)',
+  'Macro - Cross Markets',
+  'Macro - Duration/Curve (AP)',
+  'Macro - FX',
+  'Macro - Libor Basis (AP)',
+  'Macro - Swap Spreads (AP)',
+  'Macro - XCCY Basis',
+  'Micro - Rich Cheap (AP)',
+  'Options Volatility (AP)'
+];
 
 /**
  * Generate a random value based on seed
@@ -79,7 +93,7 @@ export function generateBulkData(numRows: number = 60000): BulkRowData[] {
       'Book.CountryRegion': getRandomItem(seed * 8, ['North America', 'Europe', 'Asia', 'LATAM']),
       'Book.Name': `Book_${Math.floor(i / 50) + 1}`,
       'Book.OTLivePxable': getRandomItem(seed * 9, ['Y', 'N']),
-      'Book.RecapGroup': `RecapGroup_${Math.floor(i / 200) + 1}`,
+      'Book.RecapGroup': getRandomItem(seed * 82, RECAP_GROUPS),
       'Book.ReportingGroup': `ReportingGroup_${Math.floor(i / 150) + 1}`,
       'Book.RiskPod': `RiskPod_${Math.floor(i / 100) + 1}`,
       'Book.Strategy': getRandomItem(seed * 10, STRATEGIES),
@@ -140,7 +154,7 @@ export function generateBulkData(numRows: number = 60000): BulkRowData[] {
 
       // Other fields
       has_strategy_position_changes: getRandomItem(seed * 51, ['Y', 'N']),
-      trader: `Trader_${Math.floor(i / 500) + 1}`,
+      trader: getRandomItem(seed * 143, TRADERS),
     });
   }
 
