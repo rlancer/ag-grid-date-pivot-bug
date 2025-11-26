@@ -69,93 +69,124 @@ function getRandomDate(seed: number): string {
 
 /**
  * Generate bulk data with 60k+ rows
+ * Fixed number of traders (10), recap groups (11), dominant countries (5), and strategies (6)
+ * Each trader gets exactly the same number of PL records
  */
 export function generateBulkData(numRows: number = 60000): BulkRowData[] {
   const data: BulkRowData[] = [];
 
-  for (let i = 0; i < numRows; i++) {
-    const seed = i + 1;
+  // Fixed dimensions - use all of them equally
+  const DOMINANT_COUNTRIES = ['US', 'UK', 'JP', 'DE', 'FR']; // 5 countries
+  const NUM_TRADERS = TRADERS.length; // 10 traders
+  const NUM_RECAP_GROUPS = RECAP_GROUPS.length; // 11 recap groups
+  const NUM_STRATEGIES = STRATEGIES.length; // 6 strategies
 
-    data.push({
-      // Core fields
-      trade_id: `TRADE_${i + 1}`,
-      prod_id: `PROD_${Math.floor(i / 10) + 1}`,
+  // Calculate records per trader (evenly distributed)
+  const recordsPerTrader = Math.floor(numRows / NUM_TRADERS);
+  const totalRows = recordsPerTrader * NUM_TRADERS; // Exact number we'll generate
 
-      // Book fields
-      'Book.Activity': getRandomItem(seed * 2, ACTIVITIES),
-      'Book.BeginLivePricing': `${String(9 + Math.floor(getRandomValue(seed * 52, 0, 8))).padStart(2, '0')}:${String(Math.floor(getRandomValue(seed * 53, 0, 60))).padStart(2, '0')}:00`,
-      'Book.Category': getRandomItem(seed * 3, CATEGORIES),
-      'Book.Code': `BOOK_${Math.floor(i / 100) + 1}`,
-      'Book.DeltaHedgeFlag': getRandomItem(seed * 4, ['Y', 'N']),
-      'Book.DominantCountry': getRandomItem(seed * 5, ['US', 'UK', 'JP', 'DE', 'FR']),
-      'Book.Entity': getRandomItem(seed * 6, ENTITIES),
-      'Book.Fund': getRandomItem(seed * 7, FUNDS),
-      'Book.CountryRegion': getRandomItem(seed * 8, ['North America', 'Europe', 'Asia', 'LATAM']),
-      'Book.Name': `Book_${Math.floor(i / 50) + 1}`,
-      'Book.OTLivePxable': getRandomItem(seed * 9, ['Y', 'N']),
-      'Book.RecapGroup': getRandomItem(seed * 82, RECAP_GROUPS),
-      'Book.ReportingGroup': `ReportingGroup_${Math.floor(i / 150) + 1}`,
-      'Book.RiskPod': `RiskPod_${Math.floor(i / 100) + 1}`,
-      'Book.Strategy': getRandomItem(seed * 10, STRATEGIES),
-      'Book.SubActivity': `SubActivity_${Math.floor(i / 300) + 1}`,
-      'Book.SubCategory': `SubCategory_${Math.floor(i / 250) + 1}`,
-      'Book.SubTheme': `SubTheme_${Math.floor(i / 400) + 1}`,
-      'Book.Theme': `Theme_${Math.floor(i / 500) + 1}`,
-      'Book.UnderlyingCommodity': getRandomItem(seed * 11, ['Gold', 'Oil', 'Gas', 'Corn', 'Wheat', 'N/A']),
+  console.log(`Generating ${totalRows} rows (${recordsPerTrader} records per trader, ${NUM_TRADERS} traders)`);
+  console.log(`Traders: ${NUM_TRADERS}, Recap Groups: ${NUM_RECAP_GROUPS}, Countries: ${DOMINANT_COUNTRIES.length}, Strategies: ${NUM_STRATEGIES}`);
 
-      // Product fields
-      'Product.adjusted_maturity_date': getRandomDate(seed * 12),
-      'Product.adjusted_premium': getRandomValue(seed * 13, -10000, 10000),
-      'Product.bbg_ticker': `BBG_${Math.floor(i / 20) + 1}`,
-      'Product.security_cusip': `CUSIP${String(Math.floor(i / 30) + 1).padStart(6, '0')}`,
-      'Product.executing_party': `Party_${Math.floor(i / 80) + 1}`,
-      'Product.currency': getRandomItem(seed * 14, CURRENCIES),
-      'Product.security_isin': `ISIN${String(Math.floor(i / 25) + 1).padStart(9, '0')}`,
-      'Product.index_family': getRandomItem(seed * 15, ['SOFR', 'LIBOR', 'EURIBOR', 'SONIA', 'N/A']),
-      'Product.index_series': getRandomValue(seed * 16, 1, 10),
-      'Product.index_tenor': getRandomItem(seed * 17, ['1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y']),
-      'Product.maturity_date': getRandomDate(seed * 18),
-      'Product.option_strike': getRandomValue(seed * 19, 50, 200),
-      'Product.option_type': getRandomItem(seed * 20, ['Call', 'Put', 'N/A']),
-      'Product.premium': getRandomValue(seed * 21, -50000, 50000),
-      'Product.premium_currency': getRandomItem(seed * 22, CURRENCIES),
-      'Product.premium_date': getRandomDate(seed * 23),
-      'Product.processing_type': getRandomItem(seed * 24, ['Live', 'End of Day', 'Intraday']),
-      'Product.category': getRandomItem(seed * 25, CATEGORIES),
-      'Product.product_type': getRandomItem(seed * 26, PRODUCT_TYPES),
-      'Product.security_default_ticker': `TICKER_${Math.floor(i / 15) + 1}`,
-      'Product.trade_date': getRandomDate(seed * 27),
-      'Product.trade_type': getRandomItem(seed * 28, ['Buy', 'Sell', 'Exercise', 'Assign']),
-      'Product.underlier_info': `Underlier_${Math.floor(i / 60) + 1}`,
+  let rowIndex = 0;
 
-      // Measure fields - PL and amounts
-      accrual_effect: getRandomValue(seed * 29, -10000, 10000),
-      change_quote_close: getRandomValue(seed * 30, -5, 5),
-      change_nominal: getRandomValue(seed * 31, -100000, 100000),
-      quote_close: getRandomValue(seed * 32, 95, 105),
-      end_nominal: getRandomValue(seed * 33, 1000000, 10000000),
-      end_price: getRandomValue(seed * 34, 95, 105),
-      end_quantity: getRandomValue(seed * 35, 1000, 100000),
-      end_quote: getRandomValue(seed * 36, 95, 105),
-      end_settlement_amount: getRandomValue(seed * 37, -100000, 100000),
-      fx_pl_effect: getRandomValue(seed * 38, -5000, 5000),
-      fx_pl_effect_close: getRandomValue(seed * 39, -5000, 5000),
-      life_cycle_pl: getRandomValue(seed * 40, -10000, 10000),
-      pl_base_after_close: getRandomValue(seed * 41, -20000, 20000),
-      pl_base_ccy: getRandomValue(seed * 42, -50000, 50000),
-      pl_base_close: getRandomValue(seed * 43, -30000, 30000),
-      pl_close: getRandomValue(seed * 44, -25000, 25000),
-      pl_base: getRandomValue(seed * 45, -40000, 40000),
-      pl_latest: getRandomValue(seed * 46, -35000, 35000),
-      start_nominal: getRandomValue(seed * 47, 1000000, 10000000),
-      start_price: getRandomValue(seed * 48, 95, 105),
-      start_quantity: getRandomValue(seed * 49, 1000, 100000),
-      start_quote: getRandomValue(seed * 50, 95, 105),
+  // Iterate through each trader
+  for (let traderIdx = 0; traderIdx < NUM_TRADERS; traderIdx++) {
+    // Generate exactly recordsPerTrader rows for this trader
+    for (let recordIdx = 0; recordIdx < recordsPerTrader; recordIdx++) {
+      const seed = rowIndex + 1;
 
-      // Other fields
-      has_strategy_position_changes: getRandomItem(seed * 51, ['Y', 'N']),
-      trader: getRandomItem(seed * 143, TRADERS),
-    });
+      // Cycle through combinations of recap, country, and strategy
+      const combinationIdx = recordIdx % (NUM_RECAP_GROUPS * DOMINANT_COUNTRIES.length * NUM_STRATEGIES);
+      const recapIdx = Math.floor(combinationIdx / (DOMINANT_COUNTRIES.length * NUM_STRATEGIES)) % NUM_RECAP_GROUPS;
+      const countryIdx = Math.floor(combinationIdx / NUM_STRATEGIES) % DOMINANT_COUNTRIES.length;
+      const strategyIdx = combinationIdx % NUM_STRATEGIES;
+
+            data.push({
+              // Core fields
+              trade_id: `TRADE_${rowIndex + 1}`,
+              prod_id: `PROD_${Math.floor(rowIndex / 10) + 1}`,
+
+              // Fixed dimensions - use the current indices
+              trader: TRADERS[traderIdx],
+              'Book.RecapGroup': RECAP_GROUPS[recapIdx],
+              'Book.DominantCountry': DOMINANT_COUNTRIES[countryIdx],
+              'Book.Strategy': STRATEGIES[strategyIdx],
+
+              // Book fields
+              'Book.Activity': getRandomItem(seed * 2, ACTIVITIES),
+              'Book.BeginLivePricing': `${String(9 + Math.floor(getRandomValue(seed * 52, 0, 8))).padStart(2, '0')}:${String(Math.floor(getRandomValue(seed * 53, 0, 60))).padStart(2, '0')}:00`,
+              'Book.Category': getRandomItem(seed * 3, CATEGORIES),
+              'Book.Code': `BOOK_${Math.floor(rowIndex / 100) + 1}`,
+              'Book.DeltaHedgeFlag': getRandomItem(seed * 4, ['Y', 'N']),
+              'Book.Entity': getRandomItem(seed * 6, ENTITIES),
+              'Book.Fund': getRandomItem(seed * 7, FUNDS),
+              'Book.CountryRegion': getRandomItem(seed * 8, ['North America', 'Europe', 'Asia', 'LATAM']),
+              'Book.Name': `Book_${Math.floor(rowIndex / 50) + 1}`,
+              'Book.OTLivePxable': getRandomItem(seed * 9, ['Y', 'N']),
+              'Book.ReportingGroup': `ReportingGroup_${Math.floor(rowIndex / 150) + 1}`,
+              'Book.RiskPod': `RiskPod_${Math.floor(rowIndex / 100) + 1}`,
+              'Book.SubActivity': `SubActivity_${Math.floor(rowIndex / 300) + 1}`,
+              'Book.SubCategory': `SubCategory_${Math.floor(rowIndex / 250) + 1}`,
+              'Book.SubTheme': `SubTheme_${Math.floor(rowIndex / 400) + 1}`,
+              'Book.Theme': `Theme_${Math.floor(rowIndex / 500) + 1}`,
+              'Book.UnderlyingCommodity': getRandomItem(seed * 11, ['Gold', 'Oil', 'Gas', 'Corn', 'Wheat', 'N/A']),
+
+              // Product fields
+              'Product.adjusted_maturity_date': getRandomDate(seed * 12),
+              'Product.adjusted_premium': getRandomValue(seed * 13, -10000, 10000),
+              'Product.bbg_ticker': `BBG_${Math.floor(rowIndex / 20) + 1}`,
+              'Product.security_cusip': `CUSIP${String(Math.floor(rowIndex / 30) + 1).padStart(6, '0')}`,
+              'Product.executing_party': `Party_${Math.floor(rowIndex / 80) + 1}`,
+              'Product.currency': getRandomItem(seed * 14, CURRENCIES),
+              'Product.security_isin': `ISIN${String(Math.floor(rowIndex / 25) + 1).padStart(9, '0')}`,
+              'Product.index_family': getRandomItem(seed * 15, ['SOFR', 'LIBOR', 'EURIBOR', 'SONIA', 'N/A']),
+              'Product.index_series': getRandomValue(seed * 16, 1, 10),
+              'Product.index_tenor': getRandomItem(seed * 17, ['1M', '3M', '6M', '1Y', '2Y', '5Y', '10Y']),
+              'Product.maturity_date': getRandomDate(seed * 18),
+              'Product.option_strike': getRandomValue(seed * 19, 50, 200),
+              'Product.option_type': getRandomItem(seed * 20, ['Call', 'Put', 'N/A']),
+              'Product.premium': getRandomValue(seed * 21, -50000, 50000),
+              'Product.premium_currency': getRandomItem(seed * 22, CURRENCIES),
+              'Product.premium_date': getRandomDate(seed * 23),
+              'Product.processing_type': getRandomItem(seed * 24, ['Live', 'End of Day', 'Intraday']),
+              'Product.category': getRandomItem(seed * 25, CATEGORIES),
+              'Product.product_type': getRandomItem(seed * 26, PRODUCT_TYPES),
+              'Product.security_default_ticker': `TICKER_${Math.floor(rowIndex / 15) + 1}`,
+              'Product.trade_date': getRandomDate(seed * 27),
+              'Product.trade_type': getRandomItem(seed * 28, ['Buy', 'Sell', 'Exercise', 'Assign']),
+              'Product.underlier_info': `Underlier_${Math.floor(rowIndex / 60) + 1}`,
+
+              // Measure fields - PL and amounts (these scale with the number of records)
+              accrual_effect: getRandomValue(seed * 29, -10000, 10000),
+              change_quote_close: getRandomValue(seed * 30, -5, 5),
+              change_nominal: getRandomValue(seed * 31, -100000, 100000),
+              quote_close: getRandomValue(seed * 32, 95, 105),
+              end_nominal: getRandomValue(seed * 33, 1000000, 10000000),
+              end_price: getRandomValue(seed * 34, 95, 105),
+              end_quantity: getRandomValue(seed * 35, 1000, 100000),
+              end_quote: getRandomValue(seed * 36, 95, 105),
+              end_settlement_amount: getRandomValue(seed * 37, -100000, 100000),
+              fx_pl_effect: getRandomValue(seed * 38, -5000, 5000),
+              fx_pl_effect_close: getRandomValue(seed * 39, -5000, 5000),
+              life_cycle_pl: getRandomValue(seed * 40, -10000, 10000),
+              pl_base_after_close: getRandomValue(seed * 41, -20000, 20000),
+              pl_base_ccy: getRandomValue(seed * 42, -50000, 50000),
+              pl_base_close: getRandomValue(seed * 43, -30000, 30000),
+              pl_close: getRandomValue(seed * 44, -25000, 25000),
+              pl_base: getRandomValue(seed * 45, -40000, 40000),
+              pl_latest: getRandomValue(seed * 46, -35000, 35000),
+              start_nominal: getRandomValue(seed * 47, 1000000, 10000000),
+              start_price: getRandomValue(seed * 48, 95, 105),
+              start_quantity: getRandomValue(seed * 49, 1000, 100000),
+              start_quote: getRandomValue(seed * 50, 95, 105),
+
+              // Other fields
+              has_strategy_position_changes: getRandomItem(seed * 51, ['Y', 'N']),
+            });
+
+      rowIndex++;
+    }
   }
 
   return data;

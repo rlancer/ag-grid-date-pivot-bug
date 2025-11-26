@@ -171,7 +171,7 @@ export default function DevExtremeGrid() {
           <Column dataField="Product.executing_party" caption="Counter Party" />
           <Column dataField="Product.currency" caption="Currency" />
           <Column dataField="Book.DeltaHedgeFlag" caption="DeltaHedgeFlag" />
-          <Column dataField="Book.DominantCountry" caption="Dominant Country" groupIndex={2} />
+          <Column dataField="Book.DominantCountry" caption="Dominant Country" />
           <Column dataField="end_nominal" caption="End Nominal" />
           <Column dataField="end_price" caption="End Price" />
           <Column dataField="end_quantity" caption="End Quantity" />
@@ -206,7 +206,7 @@ export default function DevExtremeGrid() {
           <Column dataField="prod_id" caption="Prod Id" />
           <Column dataField="Product.category" caption="Product Category" />
           <Column dataField="Product.product_type" caption="Product Type" />
-          <Column dataField="Book.RecapGroup" caption="Recap Group" groupIndex={1} />
+          <Column dataField="Book.RecapGroup" caption="Recap Group" />
           <Column dataField="Book.ReportingGroup" caption="Reporting Group" />
           <Column dataField="Book.RiskPod" caption="Risk Pod" />
           <Column dataField="Product.security_default_ticker" caption="Security Default Ticker" />
@@ -214,7 +214,7 @@ export default function DevExtremeGrid() {
           <Column dataField="start_price" caption="Start Price" />
           <Column dataField="start_quantity" caption="Start Quantity" />
           <Column dataField="start_quote" caption="Start Quote" />
-          <Column dataField="Book.Strategy" caption="Strategy" groupIndex={3} />
+          <Column dataField="Book.Strategy" caption="Strategy" />
           <Column dataField="trader" caption="Trader" groupIndex={0} />
           <Column dataField="Book.SubActivity" caption="SubActivity" />
           <Column dataField="Book.SubCategory" caption="SubCategory" />
